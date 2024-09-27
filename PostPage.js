@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Form, Button, Dropdown, Segment, Message, Grid } from 'semantic-ui-react';
 import { db, storage } from '../firebase'; 
-import QuestionForm from './QuestionForm';
-import ArticleForm from './ArticleForm';
 
 const PostPage = () => {
   const [postType, setPostType] = useState('');
@@ -10,6 +8,7 @@ const PostPage = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [image, setImage] = useState(null);
+  const [tags, setTags] = useState('');
   const [uploading, setUploading] = useState(false);
 
   const handleTypeChange = (e, { value }) => {
@@ -31,16 +30,18 @@ const PostPage = () => {
       imageUrl = await storageRef.getDownloadURL();
     }
 
-    await db.collection('posts').add({
+    await db.collection('questions').add({
       type: postType,
       title,
       description,
+      tags: tags.split(','), 
       imageUrl,
       timestamp: new Date()
     });
 
     setTitle('');
     setDescription('');
+    setTags('');
     setImage(null);
     setSubmitted(true);
     setUploading(false);
@@ -82,6 +83,15 @@ const PostPage = () => {
                     placeholder="Enter description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                  />
+                </Form.Field>
+
+                <Form.Field>
+                  <label>Tags (comma separated)</label>
+                  <input
+                    placeholder="Enter tags"
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
                   />
                 </Form.Field>
 
